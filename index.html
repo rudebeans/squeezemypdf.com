@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SquishMyPDF – Compress, Merge & Rotate PDFs Free</title>
+<meta name="description" content="Free, private PDF tools that run entirely in your browser. Compress, merge, and rotate PDFs — no uploads, no sign-up.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text y='22' x='4' font-size='18' font-family='system-ui' font-weight='900' fill='white'>S</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e2e0d8;
+    --text: #1a1916;
+    --muted: #888580;
+    --accent: #2563eb;
+    --accent-light: #eff4ff;
+    --accent-hover: #1d4ed8;
+    --success: #16a34a;
+    --success-light: #f0fdf4;
+    --danger: #dc2626;
+    --danger-light: #fef2f2;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-icon svg { color: #fff; }
+  .logo-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -.03em;
+  }
+  .logo-text span { color: var(--accent); }
+  nav { display: flex; gap: .25rem; }
+  nav button {
+    background: none;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: .875rem;
+    font-weight: 600;
+    color: var(--muted);
+    padding: .5rem .9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  nav button:hover { background: var(--bg); color: var(--text); }
+  nav button.active { background: var(--accent-light); color: var(--accent); }
+
+  /* ── Layout ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  /* ── Tool Section ── */
+  .tool { display: none; }
+  .tool.active { display: block; }
+
+  .tool-header { margin-bottom: 2rem; }
+  .tool-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    line-height: 1.15;
+  }
+  .tool-header p {
+    color: var(--muted);
+    margin-top: .35rem;
+    font-size: .9375rem;
+  }
+
+  /* ── Drop Zone ── */
+  .dropzone {
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .dropzone:hover, .dropzone.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .dropzone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .dropzone-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--bg);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    border: 1px solid var(--border);
+  }
+  .dropzone h3 { font-size: 1rem; font-weight: 600; }
+  .dropzone p { color: var(--muted); font-size: .875rem; margin-top: .3rem; }
+  .dropzone .file-types {
+    display: inline-flex;
+    gap: .4rem;
+    margin-top: .75rem;
+  }
+  .badge {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--muted);
+    padding: .2rem .5rem;
+    letter-spacing: .04em;
+  }
+
+  /* ── File List ── */
+  .file-list {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+  .file-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    animation: slideIn .2s ease;
+  }
+  @keyframes slideIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .file-item-icon {
+    width: 36px;
+    height: 36px;
+    background: #fee2e2;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: .65rem;
+    font-weight: 700;
+    color: #b91c1c;
+    letter-spacing: .04em;
+  }
+  .file-item-info { flex: 1; min-width: 0; }
+  .file-item-name {
+    font-size: .875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .file-item-size { font-size: .75rem; color: var(--muted); }
+  .file-item-actions { display: flex; gap: .25rem; }
+  .icon-btn {
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    transition: background .15s, color .15s;
+  }
+  .icon-btn:hover { background: var(--bg); color: var(--danger); }
+  .icon-btn.up:hover, .icon-btn.down:hover { color: var(--accent); }
+
+  /* ── Controls ── */
+  .controls {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: .875rem;
+    font-weight: 600;
+    padding: .6rem 1.3rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background .15s, transform .1s, box-shadow .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(37,99,235,.3);
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--bg); }
+
+  /* ── Compress Options ── */
+  .compress-options {
+    margin-top: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+  }
+  .compress-options h4 { font-size: .875rem; font-weight: 600; margin-bottom: .75rem; }
+  .quality-grid { display: flex; gap: .6rem; }
+  .quality-card {
+    flex: 1;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: .9rem 1rem;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    background: var(--bg);
+  }
+  .quality-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .quality-card input { display: none; }
+  .quality-card-name { font-size: .875rem; font-weight: 600; display: block; }
+  .quality-card-desc { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+
+  /* ── Rotate Options ── */
+  .rotate-options {
+    margin-top: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+  }
+  .rotate-options h4 { font-size: .875rem; font-weight: 600; margin-bottom: .75rem; }
+  .rotate-grid { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .rotate-card {
+    flex: 1;
+    min-width: 110px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: .75rem 1rem;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    background: var(--bg);
+    text-align: center;
+  }
+  .rotate-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .rotate-card input { display: none; }
+  .rotate-card-icon { font-size: 1.4rem; display: block; margin-bottom: .3rem; }
+  .rotate-card-name { font-size: .8125rem; font-weight: 600; }
+
+  /* ── Progress / Result ── */
+  .progress-wrap {
+    margin-top: 1.5rem;
+    display: none;
+  }
+  .progress-wrap.visible { display: block; }
+  .progress-bar-track {
+    background: var(--border);
+    border-radius: 999px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .progress-label {
+    font-size: .8125rem;
+    color: var(--muted);
+    margin-top: .5rem;
+  }
+
+  .result-card {
+    margin-top: 1.5rem;
+    background: var(--success-light);
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    display: none;
+    animation: slideIn .25s ease;
+  }
+  .result-card.visible { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .result-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--success);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .result-info { flex: 1; }
+  .result-info strong { font-size: .9375rem; font-weight: 600; color: var(--success); }
+  .result-info p { font-size: .8125rem; color: #15803d; margin-top: .15rem; }
+  .btn-download {
+    background: var(--success);
+    color: #fff;
+    font-family: inherit;
+    font-size: .875rem;
+    font-weight: 600;
+    padding: .55rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .btn-download:hover { background: #15803d; }
+
+  .error-card {
+    margin-top: 1.5rem;
+    background: var(--danger-light);
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    font-size: .875rem;
+    color: var(--danger);
+    display: none;
+  }
+  .error-card.visible { display: block; }
+
+  /* ── Divider ── */
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    header { padding: 0 1rem; }
+    nav button { padding: .5rem .6rem; font-size: .8rem; }
+    main { padding: 2rem 1rem 4rem; }
+    .tool-header h1 { font-size: 1.6rem; }
+    .quality-grid, .rotate-grid { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+      </svg>
+    </div>
+    <span class="logo-text">SquishMy<span>PDF</span></span>
+  </a>
+  <nav>
+    <button class="active" onclick="switchTool('merge')">Merge</button>
+    <button onclick="switchTool('compress')">Compress</button>
+    <button onclick="switchTool('rotate')">Rotate</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ── MERGE ── -->
+  <section id="tool-merge" class="tool active">
+    <div class="tool-header">
+      <h1>Merge PDFs</h1>
+      <p>Combine multiple PDF files into one document. Drag to reorder before merging.</p>
+    </div>
+
+    <div class="dropzone" id="merge-drop" ondragover="onDragOver(event,'merge-drop')" ondragleave="onDragLeave('merge-drop')" ondrop="onDrop(event,'merge')">
+      <input type="file" id="merge-input" accept=".pdf" multiple onchange="onFileSelect(event,'merge')">
+      <div class="dropzone-icon">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+        </svg>
+      </div>
+      <h3>Drop PDF files here</h3>
+      <p>or click to browse</p>
+      <div class="file-types"><span class="badge">PDF</span></div>
+    </div>
+
+    <div class="file-list" id="merge-file-list"></div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="merge-btn" onclick="mergePDFs()" disabled>
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+        Merge PDFs
+      </button>
+      <button class="btn btn-secondary" onclick="clearFiles('merge')">Clear all</button>
+    </div>
+
+    <div class="progress-wrap" id="merge-progress">
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="merge-bar"></div></div>
+      <p class="progress-label" id="merge-label">Processing…</p>
+    </div>
+    <div class="result-card" id="merge-result">
+      <div class="result-icon">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+      </div>
+      <div class="result-info">
+        <strong>Merge complete!</strong>
+        <p id="merge-result-info"></p>
+      </div>
+      <a class="btn-download" id="merge-download">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12M12 16.5V3"/></svg>
+        Download
+      </a>
+    </div>
+    <div class="error-card" id="merge-error"></div>
+  </section>
+
+  <!-- ── COMPRESS ── -->
+  <section id="tool-compress" class="tool">
+    <div class="tool-header">
+      <h1>Compress PDF</h1>
+      <p>Reduce file size while preserving quality. Choose your preferred compression level.</p>
+    </div>
+
+    <div class="dropzone" id="compress-drop" ondragover="onDragOver(event,'compress-drop')" ondragleave="onDragLeave('compress-drop')" ondrop="onDrop(event,'compress')">
+      <input type="file" id="compress-input" accept=".pdf" onchange="onFileSelect(event,'compress')">
+      <div class="dropzone-icon">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+        </svg>
+      </div>
+      <h3>Drop a PDF file here</h3>
+      <p>or click to browse — single file only</p>
+      <div class="file-types"><span class="badge">PDF</span></div>
+    </div>
+
+    <div class="file-list" id="compress-file-list"></div>
+
+    <div class="compress-options">
+      <h4>Compression level</h4>
+      <div class="quality-grid">
+        <label class="quality-card" onclick="selectQuality(this)">
+          <input type="radio" name="quality" value="screen" checked>
+          <span class="quality-card-name">Small</span>
+          <span class="quality-card-desc">Max compression, lower fidelity</span>
+        </label>
+        <label class="quality-card selected" onclick="selectQuality(this)">
+          <input type="radio" name="quality" value="ebook">
+          <span class="quality-card-name">Balanced</span>
+          <span class="quality-card-desc">Good quality, smaller size</span>
+        </label>
+        <label class="quality-card" onclick="selectQuality(this)">
+          <input type="radio" name="quality" value="printer">
+          <span class="quality-card-name">High Quality</span>
+          <span class="quality-card-desc">Minimal loss, larger file</span>
+        </label>
+      </div>
+    </div>
+
+    <p style="font-size:.8rem;color:var(--muted);margin-top:.75rem;line-height:1.5;">
+      ℹ️ Pages are re-rendered and recompressed as images — this achieves real file size reduction (often 50–80%) but selectable text and hyperlinks will not be preserved in the output.
+    </p>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="compress-btn" onclick="compressPDF()" disabled>
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/></svg>
+        Compress PDF
+      </button>
+      <button class="btn btn-secondary" onclick="clearFiles('compress')">Clear</button>
+    </div>
+
+    <div class="progress-wrap" id="compress-progress">
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="compress-bar"></div></div>
+      <p class="progress-label" id="compress-label">Processing…</p>
+    </div>
+    <div class="result-card" id="compress-result">
+      <div class="result-icon">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+      </div>
+      <div class="result-info">
+        <strong>Compression complete!</strong>
+        <p id="compress-result-info"></p>
+      </div>
+      <a class="btn-download" id="compress-download">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12M12 16.5V3"/></svg>
+        Download
+      </a>
+    </div>
+    <div class="error-card" id="compress-error"></div>
+  </section>
+
+  <!-- ── ROTATE ── -->
+  <section id="tool-rotate" class="tool">
+    <div class="tool-header">
+      <h1>Rotate Pages</h1>
+      <p>Fix page orientation in any PDF — rotate all pages or apply globally.</p>
+    </div>
+
+    <div class="dropzone" id="rotate-drop" ondragover="onDragOver(event,'rotate-drop')" ondragleave="onDragLeave('rotate-drop')" ondrop="onDrop(event,'rotate')">
+      <input type="file" id="rotate-input" accept=".pdf" onchange="onFileSelect(event,'rotate')">
+      <div class="dropzone-icon">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+        </svg>
+      </div>
+      <h3>Drop a PDF file here</h3>
+      <p>or click to browse — single file only</p>
+      <div class="file-types"><span class="badge">PDF</span></div>
+    </div>
+
+    <div class="file-list" id="rotate-file-list"></div>
+
+    <div class="rotate-options">
+      <h4>Rotation direction (applied to all pages)</h4>
+      <div class="rotate-grid">
+        <label class="rotate-card selected" onclick="selectRotate(this)">
+          <input type="radio" name="rotation" value="90" checked>
+          <span class="rotate-card-icon">↻</span>
+          <span class="rotate-card-name">90° Clockwise</span>
+        </label>
+        <label class="rotate-card" onclick="selectRotate(this)">
+          <input type="radio" name="rotation" value="180">
+          <span class="rotate-card-icon">↕</span>
+          <span class="rotate-card-name">180° Flip</span>
+        </label>
+        <label class="rotate-card" onclick="selectRotate(this)">
+          <input type="radio" name="rotation" value="270">
+          <span class="rotate-card-icon">↺</span>
+          <span class="rotate-card-name">90° Counter-clockwise</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="rotate-btn" onclick="rotatePDF()" disabled>
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+        Rotate Pages
+      </button>
+      <button class="btn btn-secondary" onclick="clearFiles('rotate')">Clear</button>
+    </div>
+
+    <div class="progress-wrap" id="rotate-progress">
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="rotate-bar"></div></div>
+      <p class="progress-label" id="rotate-label">Processing…</p>
+    </div>
+    <div class="result-card" id="rotate-result">
+      <div class="result-icon">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+      </div>
+      <div class="result-info">
+        <strong>Rotation complete!</strong>
+        <p id="rotate-result-info"></p>
+      </div>
+      <a class="btn-download" id="rotate-download">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12M12 16.5V3"/></svg>
+        Download
+      </a>
+    </div>
+    <div class="error-card" id="rotate-error"></div>
+  </section>
+
+</main>
+
+<!-- pdf-lib -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<!-- PDF.js for rendering pages to canvas (real compression) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  // Configure PDF.js worker
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
+
+<script>
+// ─── State ───────────────────────────────────────────────────
+const state = {
+  merge: { files: [] },
+  compress: { files: [] },
+  rotate: { files: [] }
+};
+
+// ─── Navigation ──────────────────────────────────────────────
+function switchTool(tool) {
+  document.querySelectorAll('.tool').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach((b, i) => {
+    b.classList.toggle('active', ['merge','compress','rotate'][i] === tool);
+  });
+  document.getElementById(`tool-${tool}`).classList.add('active');
+}
+
+// ─── Drag & Drop ─────────────────────────────────────────────
+function onDragOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('drag-over'); }
+function onDragLeave(id) { document.getElementById(id).classList.remove('drag-over'); }
+function onDrop(e, tool) {
+  e.preventDefault();
+  document.getElementById(`${tool}-drop`).classList.remove('drag-over');
+  const files = [...e.dataTransfer.files].filter(f => f.type === 'application/pdf');
+  addFiles(tool, files);
+}
+function onFileSelect(e, tool) { addFiles(tool, [...e.target.files]); e.target.value = ''; }
+
+// ─── File Management ─────────────────────────────────────────
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/(1024*1024)).toFixed(2) + ' MB';
+}
+
+function addFiles(tool, newFiles) {
+  const isSingle = tool !== 'merge';
+  if (isSingle) { state[tool].files = newFiles.slice(0,1); }
+  else { state[tool].files.push(...newFiles); }
+  renderFileList(tool);
+  updateBtn(tool);
+  hideResults(tool);
+}
+
+function clearFiles(tool) {
+  state[tool].files = [];
+  renderFileList(tool);
+  updateBtn(tool);
+  hideResults(tool);
+}
+
+function removeFile(tool, idx) {
+  state[tool].files.splice(idx, 1);
+  renderFileList(tool);
+  updateBtn(tool);
+}
+
+function moveFile(tool, idx, dir) {
+  const arr = state[tool].files;
+  const target = idx + dir;
+  if (target < 0 || target >= arr.length) return;
+  [arr[idx], arr[target]] = [arr[target], arr[idx]];
+  renderFileList(tool);
+}
+
+function renderFileList(tool) {
+  const list = document.getElementById(`${tool}-file-list`);
+  const files = state[tool].files;
+  list.innerHTML = '';
+  files.forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `
+      <div class="file-item-icon">PDF</div>
+      <div class="file-item-info">
+        <div class="file-item-name">${escHtml(f.name)}</div>
+        <div class="file-item-size">${formatBytes(f.size)}</div>
+      </div>
+      <div class="file-item-actions">
+        ${tool === 'merge' ? `
+          <button class="icon-btn up" title="Move up" onclick="moveFile('merge',${i},-1)">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+          </button>
+          <button class="icon-btn down" title="Move down" onclick="moveFile('merge',${i},1)">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </button>
+        ` : ''}
+        <button class="icon-btn" title="Remove" onclick="removeFile('${tool}',${i})">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function updateBtn(tool) {
+  const btn = document.getElementById(`${tool}-btn`);
+  btn.disabled = state[tool].files.length === 0;
+}
+
+function hideResults(tool) {
+  document.getElementById(`${tool}-result`).classList.remove('visible');
+  document.getElementById(`${tool}-error`).classList.remove('visible');
+  document.getElementById(`${tool}-progress`).classList.remove('visible');
+}
+
+// ─── Progress helpers ─────────────────────────────────────────
+function showProgress(tool, pct, label) {
+  document.getElementById(`${tool}-progress`).classList.add('visible');
+  document.getElementById(`${tool}-bar`).style.width = pct + '%';
+  document.getElementById(`${tool}-label`).textContent = label;
+}
+function showError(tool, msg) {
+  const el = document.getElementById(`${tool}-error`);
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('visible');
+  document.getElementById(`${tool}-progress`).classList.remove('visible');
+}
+function showResult(tool, info, blob, filename) {
+  document.getElementById(`${tool}-progress`).classList.remove('visible');
+  document.getElementById(`${tool}-result-info`).textContent = info;
+  const link = document.getElementById(`${tool}-download`);
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.getElementById(`${tool}-result`).classList.add('visible');
+}
+
+// ─── MERGE ───────────────────────────────────────────────────
+async function mergePDFs() {
+  const files = state.merge.files;
+  if (!files.length) return;
+  hideResults('merge');
+  showProgress('merge', 10, 'Loading files…');
+  try {
+    const { PDFDocument } = PDFLib;
+    const merged = await PDFDocument.create();
+    let totalPages = 0;
+    for (let i = 0; i < files.length; i++) {
+      showProgress('merge', 10 + (i / files.length) * 75, `Processing ${files[i].name}…`);
+      const bytes = await files[i].arrayBuffer();
+      const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+      const pages = await merged.copyPages(doc, doc.getPageIndices());
+      pages.forEach(p => { merged.addPage(p); totalPages++; });
+    }
+    showProgress('merge', 92, 'Saving…');
+    const out = await merged.save();
+    const blob = new Blob([out], { type: 'application/pdf' });
+    showProgress('merge', 100, 'Done!');
+    showResult('merge', `${files.length} files merged → ${totalPages} pages, ${formatBytes(blob.size)}`, blob, 'merged.pdf');
+  } catch(e) {
+    showError('merge', 'Could not merge PDFs. Make sure the files are valid and not password-protected.');
+    console.error(e);
+  }
+}
+
+// ─── COMPRESS (real image resampling via PDF.js + pdf-lib) ────
+// Strategy: render each page to a canvas at target DPI, export as JPEG,
+// embed into a new PDF. This actually shrinks image-heavy PDFs by 50-85%.
+async function compressPDF() {
+  const files = state.compress.files;
+  if (!files.length) return;
+  const level = document.querySelector('input[name="quality"]:checked')?.value || 'ebook';
+  hideResults('compress');
+
+  // Settings per level: { scale (render DPI multiplier), jpegQ (0-1) }
+  const settings = {
+    screen:  { scale: 1.0, jpegQ: 0.55 },   // ~72 dpi equivalent, heavy compression
+    ebook:   { scale: 1.5, jpegQ: 0.75 },   // ~108 dpi, good balance
+    printer: { scale: 2.0, jpegQ: 0.92 },   // ~144 dpi, high quality
+  };
+  const { scale, jpegQ } = settings[level] || settings.ebook;
+
+  const original = files[0];
+  const originalSize = original.size;
+
+  try {
+    showProgress('compress', 5, 'Loading PDF…');
+    const arrayBuffer = await original.arrayBuffer();
+
+    // Load with PDF.js for rendering
+    const pdfJsDoc = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+    const numPages = pdfJsDoc.numPages;
+
+    // Create output PDF with pdf-lib
+    const { PDFDocument } = PDFLib;
+    const outDoc = await PDFDocument.create();
+
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const pct = 5 + ((pageNum - 1) / numPages) * 88;
+      showProgress('compress', pct, `Compressing page ${pageNum} of ${numPages}…`);
+
+      const page = await pdfJsDoc.getPage(pageNum);
+      const viewport = page.getViewport({ scale });
+
+      // Render to offscreen canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      const ctx = canvas.getContext('2d');
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      // Convert to JPEG blob
+      const jpegDataUrl = canvas.toDataURL('image/jpeg', jpegQ);
+      const jpegBase64 = jpegDataUrl.split(',')[1];
+      const jpegBytes = Uint8Array.from(atob(jpegBase64), c => c.charCodeAt(0));
+
+      // Embed JPEG into pdf-lib page at original PDF dimensions
+      const originalVp = page.getViewport({ scale: 1.0 });
+      const jpegImage = await outDoc.embedJpg(jpegBytes);
+      const pdfPage = outDoc.addPage([originalVp.width, originalVp.height]);
+      pdfPage.drawImage(jpegImage, {
+        x: 0, y: 0,
+        width: originalVp.width,
+        height: originalVp.height,
+      });
+
+      // Free memory
+      canvas.width = 0; canvas.height = 0;
+    }
+
+    showProgress('compress', 95, 'Saving compressed PDF…');
+    const outBytes = await outDoc.save({ useObjectStreams: true });
+    const blob = new Blob([outBytes], { type: 'application/pdf' });
+
+    const saved = originalSize - blob.size;
+    const pct = ((saved / originalSize) * 100).toFixed(1);
+    const info = saved > 1000
+      ? `${formatBytes(originalSize)} → ${formatBytes(blob.size)} · saved ${formatBytes(saved)} (${pct}% smaller)`
+      : `${formatBytes(originalSize)} → ${formatBytes(blob.size)} · file was already well optimized`;
+
+    showResult('compress', info, blob, 'compressed.pdf');
+  } catch(e) {
+    showError('compress', 'Compression failed. The file may be password-protected or corrupted. Check the console for details.');
+    console.error(e);
+  }
+}
+
+// ─── ROTATE ──────────────────────────────────────────────────
+async function rotatePDF() {
+  const files = state.rotate.files;
+  if (!files.length) return;
+  const deg = parseInt(document.querySelector('input[name="rotation"]:checked')?.value || '90', 10);
+  hideResults('rotate');
+  showProgress('rotate', 15, 'Loading file…');
+  try {
+    const { PDFDocument, degrees } = PDFLib;
+    const bytes = await files[0].arrayBuffer();
+    const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+    const pages = doc.getPages();
+    showProgress('rotate', 40, `Rotating ${pages.length} pages by ${deg}°…`);
+    pages.forEach(page => {
+      const current = page.getRotation().angle;
+      page.setRotation(degrees((current + deg) % 360));
+    });
+    showProgress('rotate', 85, 'Saving…');
+    const out = await doc.save();
+    const blob = new Blob([out], { type: 'application/pdf' });
+    showResult('rotate', `${pages.length} page${pages.length !== 1 ? 's' : ''} rotated ${deg}°`, blob, 'rotated.pdf');
+  } catch(e) {
+    showError('rotate', 'Could not rotate this PDF. It may be password-protected or corrupted.');
+    console.error(e);
+  }
+}
+
+// ─── UI helpers for option cards ─────────────────────────────
+function selectQuality(label) {
+  document.querySelectorAll('.quality-card').forEach(c => c.classList.remove('selected'));
+  label.classList.add('selected');
+  label.querySelector('input').checked = true;
+}
+function selectRotate(label) {
+  document.querySelectorAll('.rotate-card').forEach(c => c.classList.remove('selected'));
+  label.classList.add('selected');
+  label.querySelector('input').checked = true;
+}
+</script>
+</body>
+</html>

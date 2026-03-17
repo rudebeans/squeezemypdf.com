@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SquishMyPDF — Free PDF Tools That Run in Your Browser</title>
+<title>SqueezeMyPDF — Free PDF Tools in Your Browser</title>
 <meta name="description" content="Free, private PDF tools that run entirely in your browser. Compress, merge, and rotate PDFs — no uploads, no sign-up.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text y='22' x='4' font-size='18' font-family='system-ui' font-weight='900' fill='white'>S</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230d0d0d'/><text y='22' x='4' font-size='18' font-family='system-ui' font-weight='900' fill='%239DFF03'>S</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 
@@ -20,9 +20,9 @@
     --border: #272727;
     --text: #f0ede8;
     --muted: #686868;
-    --accent: #3b82f6;
-    --accent-light: #162035;
-    --accent-hover: #2563eb;
+    --accent: #9DFF03;
+    --accent-light: #131a00;
+    --accent-hover: #84d904;
     --success: #22c55e;
     --success-light: #0a1f12;
     --danger: #ef4444;
@@ -55,27 +55,11 @@
   .logo {
     display: flex;
     align-items: center;
-    gap: .6rem;
     text-decoration: none;
+    opacity: .9;
+    transition: opacity .15s;
   }
-  .logo-icon {
-    width: 32px;
-    height: 32px;
-    background: var(--accent);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .logo-icon svg { color: #fff; }
-  .logo-text {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -.03em;
-  }
-  .logo-text span { color: var(--accent); }
+  .logo:hover { opacity: 1; }
   nav { display: flex; gap: .25rem; }
   nav button {
     background: none;
@@ -268,7 +252,7 @@
   .btn-primary {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 1px 3px rgba(37,99,235,.3);
+    box-shadow: 0 1px 3px rgba(157,255,3,.25);
   }
   .btn-primary:hover { background: var(--accent-hover); }
   .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
@@ -499,15 +483,27 @@
   /* ── Home / Hero ── */
   #tool-home.active { display: block; }
   .hero {
-    text-align: center;
-    padding: 4rem 0 3rem;
+    padding: 3rem 0 2.5rem;
   }
+  .hero-top {
+    display: flex;
+    align-items: center;
+    gap: 3.5rem;
+    margin-bottom: 3rem;
+  }
+  .hero-mark {
+    flex-shrink: 0;
+    width: 195px;
+    filter: drop-shadow(0 0 55px rgba(157,255,3,.22));
+  }
+  .hero-mark svg { width: 100%; height: auto; display: block; }
+  .hero-content { flex: 1; }
   .hero-badge {
     display: inline-flex;
     align-items: center;
     gap: .45rem;
-    background: rgba(59,130,246,.1);
-    border: 1px solid rgba(59,130,246,.2);
+    background: rgba(157,255,3,.1);
+    border: 1px solid rgba(157,255,3,.2);
     color: var(--accent);
     font-size: .75rem;
     font-weight: 700;
@@ -519,15 +515,15 @@
   }
   .hero h1 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 3.75rem;
+    font-size: 3.5rem;
     font-weight: 800;
     letter-spacing: -.055em;
     line-height: 1.06;
     color: var(--text);
-    margin-bottom: 1.1rem;
+    margin-bottom: 1rem;
   }
   .hero h1 .grad {
-    background: linear-gradient(130deg, #3b82f6 0%, #a78bfa 100%);
+    background: linear-gradient(130deg, #9DFF03 0%, #d4ff6a 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -535,16 +531,14 @@
   .hero-sub {
     font-size: 1.05rem;
     color: var(--muted);
-    max-width: 460px;
-    margin: 0 auto 3rem;
+    max-width: 440px;
+    margin: 0 0 0;
     line-height: 1.65;
   }
   .usp-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    max-width: 740px;
-    margin: 0 auto;
   }
   .usp-card {
     background: var(--surface);
@@ -564,23 +558,23 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top right, rgba(59,130,246,.07) 0%, transparent 65%);
+    background: radial-gradient(circle at top right, rgba(157,255,3,.07) 0%, transparent 65%);
     opacity: 0;
     transition: opacity .3s;
     pointer-events: none;
   }
   .usp-card:hover {
-    border-color: rgba(59,130,246,.45);
+    border-color: rgba(157,255,3,.45);
     transform: translateY(-3px);
     background: #1a1a1a;
-    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 40px rgba(157,255,3,.07);
   }
   .usp-card:hover::after { opacity: 1; }
   .usp-icon {
     width: 48px;
     height: 48px;
-    background: rgba(59,130,246,.1);
-    border: 1px solid rgba(59,130,246,.2);
+    background: rgba(157,255,3,.1);
+    border: 1px solid rgba(157,255,3,.2);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -608,10 +602,15 @@
     letter-spacing: .02em;
   }
   @media (max-width: 600px) {
+    .hero-top { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .hero-mark { width: 130px; }
+    .hero-content { text-align: center; }
+    .hero-sub { margin: 0 auto; }
+    .hero-badge { justify-content: center; }
     .hero h1 { font-size: 2.4rem; }
     .hero-sub { font-size: .9rem; }
     .usp-grid { grid-template-columns: 1fr; }
-    .hero { padding: 2.5rem 0 2rem; }
+    .hero { padding: 2rem 0 1.5rem; }
   }
 
   /* ── Dark-mode misc polish ── */
@@ -623,12 +622,22 @@
 
 <header>
   <a class="logo" href="#" onclick="switchTool('home');return false;">
-    <div class="logo-icon">
-      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
-      </svg>
-    </div>
-    <span class="logo-text">SquishMy<span>PDF</span></span>
+    <svg height="54" style="width:auto;display:block" viewBox="0 0 587.52 175.12" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#9dff03" d="M64.26,50.29c-13.96,16.49-12.19,41.02,3.78,55.35l51.44-60.72c-16.77-13.4-41.26-11.11-55.22,5.37Z"/>
+      <path fill="#9dff03" d="M116.9,120.7c13.96-16.49,12.19-41.02-3.78-55.35l-51.44,60.72c16.77,13.4,41.26,11.11,55.22-5.37Z"/>
+      <path fill="#fff" d="M151.99,93.16c3.15,2.68,6.9,4.04,11.25,4.08,5.15-.07,7.76-1.97,7.83-5.7.04-3.05-1.68-4.88-5.16-5.5-1.59-.22-3.34-.48-5.24-.76-3.41-.58-5.99-1.88-7.77-3.9-1.83-2.08-2.74-4.6-2.74-7.58,0-3.57,1.15-6.45,3.45-8.64,2.23-2.17,5.38-3.27,9.47-3.31,4.92.11,9.2,1.52,12.84,4.22l-3.34,5.09c-2.97-2.02-6.24-3.07-9.81-3.15-1.85,0-3.39.48-4.62,1.43-1.29.99-1.95,2.47-1.98,4.43,0,1.18.44,2.25,1.33,3.2.89.97,2.31,1.65,4.27,2.02,1.09.19,2.57.4,4.45.65,3.71.52,6.46,1.9,8.23,4.13,1.76,2.19,2.64,4.73,2.64,7.63-.2,7.82-4.83,11.79-13.89,11.9-5.86,0-10.9-1.86-15.12-5.58l3.94-4.66Z"/>
+      <path fill="#fff" d="M200.94,99.97c-1.05,1.04-2.14,1.86-3.28,2.46-1.23.65-2.56.98-3.99.98-1.72-.04-3.19-.4-4.4-1.09-1.27-.67-2.32-1.57-3.17-2.69-.78-.95-1.29-2.18-1.55-3.68-.31-1.5-.46-3.97-.46-7.41s.15-6.04.46-7.52c.25-1.5.77-2.7,1.55-3.62,1.59-2.44,4.12-3.7,7.57-3.79,2.98.09,5.41,1.22,7.27,3.39v-3.03h5.66v40.88h-5.66v-14.87ZM195.37,97.57c1.34,0,2.4-.28,3.18-.84.78-.54,1.31-1.26,1.6-2.14.38-.88.63-1.87.73-2.95.04-1.03.06-2.06.06-3.1,0-1.11-.02-2.2-.06-3.29-.11-1.03-.35-1.99-.73-2.87-.29-.88-.82-1.59-1.6-2.14-.78-.54-1.84-.82-3.18-.82s-2.36.23-3.07.7c-.78.51-1.35,1.2-1.71,2.08-.35.84-.57,1.82-.68,2.93-.11,1.11-.16,2.24-.16,3.4s.05,2.19.16,3.24c.11,1.07.33,2.04.68,2.93.36.84.93,1.54,1.71,2.08.71.53,1.73.79,3.07.79Z"/>
+      <path fill="#fff" d="M216.05,73.96h5.66v17.35c0,1.97.53,3.5,1.6,4.61,1.05,1.1,2.39,1.66,4.02,1.66s2.96-.55,3.99-1.66c1.05-1.1,1.58-2.64,1.58-4.61v-17.35h5.66v29.11h-5.66v-3.11h-.11c-1.86,2.3-4.3,3.45-7.3,3.45-2.33-.04-4.44-.91-6.32-2.63-2.05-1.68-3.09-4.16-3.12-7.44v-19.37Z"/>
+      <path fill="#fff" d="M252.3,90.73c0,2.34.65,4.12,1.96,5.33,1.21,1.23,2.81,1.85,4.78,1.85,2.3,0,4.36-.94,6.17-2.83l4.1,3.62c-2.88,3.18-6.26,4.75-10.15,4.71-1.48,0-2.93-.22-4.34-.67-.71-.24-1.39-.57-2.06-.98-.71-.35-1.37-.79-1.98-1.32-1.19-1.08-2.16-2.6-2.91-4.54-.81-1.87-1.22-4.3-1.22-7.29s.35-5.27,1.06-7.18c.71-1.94,1.61-3.48,2.71-4.6,1.12-1.14,2.38-1.96,3.78-2.47,1.37-.5,2.73-.76,4.07-.76,3.22.04,5.94,1.13,8.17,3.28,2.26,2.19,3.41,5.2,3.45,9.03v4.82h-17.58ZM264.22,85.91c-.07-2.27-.66-3.99-1.77-5.16-1.09-1.11-2.49-1.66-4.19-1.66s-3.1.55-4.19,1.66c-1.07,1.16-1.66,2.88-1.77,5.16h11.92Z"/>
+      <path fill="#fff" d="M282.16,90.73c0,2.34.65,4.12,1.96,5.33,1.21,1.23,2.81,1.85,4.78,1.85,2.3,0,4.36-.94,6.17-2.83l4.1,3.62c-2.88,3.18-6.26,4.75-10.15,4.71-1.48,0-2.93-.22-4.34-.67-.71-.24-1.39-.57-2.06-.98-.71-.35-1.37-.79-1.98-1.32-1.19-1.08-2.16-2.6-2.91-4.54-.81-1.87-1.22-4.3-1.22-7.29s.35-5.27,1.06-7.18c.71-1.94,1.61-3.48,2.71-4.6,1.12-1.14,2.38-1.96,3.78-2.47,1.37-.5,2.73-.76,4.07-.76,3.22.04,5.94,1.13,8.17,3.28,2.26,2.19,3.41,5.2,3.45,9.03v4.82h-17.58ZM294.08,85.91c-.07-2.27-.66-3.99-1.77-5.16-1.09-1.11-2.49-1.66-4.19-1.66s-3.1.55-4.19,1.66c-1.07,1.16-1.66,2.88-1.77,5.16h11.92Z"/>
+      <path fill="#fff" d="M305.92,98.44l14.13-19.32h-13.8v-5.16h20.69v4.66l-14.58,18.95h14.58v5.49h-21.02v-4.63Z"/>
+      <path fill="#fff" d="M338.66,90.73c0,2.34.65,4.12,1.96,5.33,1.21,1.23,2.81,1.85,4.78,1.85,2.3,0,4.36-.94,6.17-2.83l4.1,3.62c-2.88,3.18-6.26,4.75-10.15,4.71-1.48,0-2.93-.22-4.34-.67-.71-.24-1.39-.57-2.06-.98-.71-.35-1.37-.79-1.98-1.32-1.19-1.08-2.16-2.6-2.91-4.54-.81-1.87-1.22-4.3-1.22-7.29s.35-5.27,1.06-7.18c.71-1.94,1.61-3.48,2.71-4.6,1.12-1.14,2.38-1.96,3.78-2.47,1.37-.5,2.73-.76,4.07-.76,3.22.04,5.94,1.13,8.17,3.28,2.26,2.19,3.41,5.2,3.45,9.03v4.82h-17.58ZM350.58,85.91c-.07-2.27-.66-3.99-1.77-5.16-1.09-1.11-2.49-1.66-4.19-1.66s-3.1.55-4.19,1.66c-1.07,1.16-1.66,2.88-1.77,5.16h11.92Z"/>
+      <path fill="#fff" d="M364.77,62.18h5.65l11.35,26.65,11.14-26.65h5.67v40.88h-6v-25.5h-.13l-8.29,19.63h-5l-8.29-19.63h-.11v25.5h-5.99v-40.88Z"/>
+      <path fill="#fff" d="M404.87,73.96h6l6.68,20.39h.11l6.65-20.39h6.03l-12.13,35.13c-.78,2.19-1.86,3.7-3.23,4.54-1.39.8-2.97,1.21-4.72,1.21h-1.87v-5.49h1.66c.74,0,1.43-.21,2.06-.62.63-.43,1.08-1.07,1.33-1.91l1.55-4.89-10.09-27.97Z"/>
+      <path fill="#b0f704" d="M436.08,62.18h14.35c1.56,0,3.06.15,4.51.45,1.45.39,2.92,1.2,4.4,2.41,1.25.92,2.26,2.23,3.04,3.93.81,1.64,1.22,3.59,1.22,5.83,0,3.03-1.03,5.79-3.1,8.27-2.12,2.62-5.22,3.96-9.3,4.04h-9.14v15.96h-5.99v-40.88ZM442.07,81.28h8.9c2.23-.04,3.91-.75,5.04-2.14,1.07-1.35,1.61-2.85,1.61-4.51,0-1.37-.22-2.53-.65-3.47-.45-.84-1.09-1.51-1.9-2-1.23-.81-2.67-1.19-4.3-1.16h-8.68v13.27Z"/>
+      <path fill="#b0f704" d="M471.27,62.18h13.86c5.36.04,9.38,2.34,12.06,6.9.96,1.53,1.56,3.14,1.82,4.82.2,1.68.3,4.59.3,8.72,0,4.39-.16,7.46-.46,9.2-.15.88-.36,1.66-.65,2.36-.31.67-.68,1.37-1.11,2.1-1.16,1.93-2.77,3.52-4.84,4.77-2.05,1.35-4.55,2.02-7.52,2.02h-13.45v-40.88ZM477.26,97.24h7.18c3.37,0,5.82-1.19,7.34-3.57.67-.88,1.1-1.99,1.28-3.34.16-1.33.25-3.82.25-7.47s-.08-6.11-.25-7.64c-.22-1.54-.73-2.78-1.55-3.74-1.67-2.38-4.03-3.53-7.07-3.46h-7.18v29.22Z"/>
+      <path fill="#b0f704" d="M508.59,62.18h25.3v5.83h-19.3v12.09h16.48v5.49h-16.48v17.47h-5.99v-40.88Z"/>
+    </svg>
   </a>
   <nav>
     <button onclick="switchTool('merge')">Merge</button>
@@ -643,12 +652,21 @@
   <!-- ── HOME ── -->
   <section id="tool-home" class="tool active">
     <div class="hero">
-      <div class="hero-badge">
-        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-        Files never leave your device
+      <div class="hero-top">
+        <div class="hero-mark">
+          <svg viewBox="0 0 333.72 354.6" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#9dff03" d="M252.16,99.01l-17.66,17.66c26.98,32.51,33.24,76.51,16.28,115.16-16.72,38.11-51.79,61.87-93.8,63.54-27.72,1.11-53.16-7.5-75.62-25.56l-17.66,17.66c39.93,34.76,95.63,43.62,142.31,22.52,40.1-18.12,68.18-53.03,77.03-95.77,8.61-41.56-2.64-83.47-30.88-115.22ZM200.51,266.4c7.63-4.68,14.94-9.89,16.73-11.64,5.07-4.96,21.85-29.13,22.54-36.16l-1.84-3.13-74.4-18.93,21.02,77.62c1.08-.08,4.87-.96,15.95-7.75ZM167.78,277.91l-20.25-74.27-54.94,54.94c21.32,17.9,49.86,25.23,75.19,19.33ZM223.27,127.9l-52.64,52.64,72.83,19.14c4.2-25.85-3.29-52.47-20.2-71.78ZM97.93,227.35c-26.98-32.51-33.24-76.51-16.28-115.16,16.72-38.11,51.79-61.87,93.8-63.54,27.73-1.1,53.16,7.5,75.62,25.56l17.66-17.66c-25.52-22.21-57.48-33.85-89.4-33.85-18.04,0-36.06,3.71-52.91,11.33-40.1,18.12-68.18,53.03-77.03,95.77-8.61,41.56,2.64,83.47,30.88,115.22l17.66-17.66ZM147.86,69.87c-1.08.08-4.87.96-15.95,7.75-7.64,4.68-14.94,9.89-16.73,11.64-5.07,4.96-21.85,29.14-22.54,36.16l1.84,3.14,74.4,18.93-21.02-77.62ZM164.65,66.11l20.25,74.27,54.94-54.94c-21.32-17.9-49.86-25.23-75.19-19.33ZM109.15,216.13l52.64-52.64-72.84-19.14c-4.2,25.85,3.29,52.47,20.2,71.78Z"/>
+          </svg>
+        </div>
+        <div class="hero-content">
+          <div class="hero-badge">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            Files never leave your device
+          </div>
+          <h1>PDF tools that<br><span class="grad">actually work.</span></h1>
+          <p class="hero-sub">Free, fast, and runs entirely in your browser. No uploads, no accounts, no nonsense.</p>
+        </div>
       </div>
-      <h1>PDF tools that<br><span class="grad">actually work.</span></h1>
-      <p class="hero-sub">Free, fast, and runs entirely in your browser. No uploads, no accounts, no nonsense.</p>
       <div class="usp-grid">
 
         <div class="usp-card" onclick="switchTool('merge')">
@@ -718,7 +736,7 @@
     <div class="dropzone" id="merge-drop" ondragover="onDragOver(event,'merge-drop')" ondragleave="onDragLeave('merge-drop')" ondrop="onDrop(event,'merge')">
       <input type="file" id="merge-input" accept=".pdf" multiple onchange="onFileSelect(event,'merge')">
       <div class="dropzone-icon">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#3b82f6" stroke-width="2">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#9DFF03" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
         </svg>
       </div>
@@ -768,7 +786,7 @@
     <div class="dropzone" id="compress-drop" ondragover="onDragOver(event,'compress-drop')" ondragleave="onDragLeave('compress-drop')" ondrop="onDrop(event,'compress')">
       <input type="file" id="compress-input" accept=".pdf" onchange="onFileSelect(event,'compress')">
       <div class="dropzone-icon">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#3b82f6" stroke-width="2">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#9DFF03" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
         </svg>
       </div>
@@ -843,7 +861,7 @@
     <div class="dropzone" id="rotate-drop" ondragover="onDragOver(event,'rotate-drop')" ondragleave="onDragLeave('rotate-drop')" ondrop="onDrop(event,'rotate')">
       <input type="file" id="rotate-input" accept=".pdf" onchange="onFileSelect(event,'rotate')">
       <div class="dropzone-icon">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#3b82f6" stroke-width="2">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#9DFF03" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
         </svg>
       </div>
@@ -914,7 +932,7 @@
          ondragover="fbDragOver(event)" ondragleave="fbDragLeave()" ondrop="fbDrop(event)">
       <input type="file" id="fb-input" accept=".pdf" onchange="fbFileSelect(event)">
       <div class="dropzone-icon">
-        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#3b82f6" stroke-width="2">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#9DFF03" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
         </svg>
       </div>
@@ -1471,7 +1489,7 @@ function fbGenerateHTML() {
   <button id="bN" onclick="goNext()">›</button>
   <button id="bL" onclick="goLast()">»</button>
 </div>
-<p class="made">Made with <a href="https://squishmypdf.com" target="_blank">SquishMyPDF</a></p>
+<p class="made">Made with <a href="https://squeezymypdf.com" target="_blank">SqueezeMyPDF</a></p>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js" async><\/script>
 <script>
 const imgs = ${JSON.stringify(dataURLs)};

@@ -743,20 +743,26 @@
   <section id="tool-merge" class="tool">
     <div class="tool-header">
       <button class="back-btn" onclick="switchTool('home')">← All tools</button>
-      <h1>Merge PDFs</h1>
-      <p>Combine multiple PDF files into one document. Drag to reorder before merging.</p>
+      <h1>Merge to PDF</h1>
+      <p>Combine PDFs, images, and Word docs into one PDF. Mix and match any format — drag to reorder.</p>
     </div>
 
     <div class="dropzone" id="merge-drop" ondragover="onDragOver(event,'merge-drop')" ondragleave="onDragLeave('merge-drop')" ondrop="onDrop(event,'merge')">
-      <input type="file" id="merge-input" accept=".pdf" multiple onchange="onFileSelect(event,'merge')">
+      <input type="file" id="merge-input" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,.bmp,.tiff,.tif,.docx" multiple onchange="onFileSelect(event,'merge')">
       <div class="dropzone-icon">
         <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#9DFF03" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
         </svg>
       </div>
-      <h3>Drop PDF files here</h3>
-      <p>or click to browse</p>
-      <div class="file-types"><span class="badge">PDF</span></div>
+      <h3>Drop files here</h3>
+      <p>or click to browse — mix any formats freely</p>
+      <div class="file-types">
+        <span class="badge">PDF</span>
+        <span class="badge">JPG</span>
+        <span class="badge">PNG</span>
+        <span class="badge">WebP</span>
+        <span class="badge">DOCX</span>
+      </div>
     </div>
 
     <div class="file-list" id="merge-file-list"></div>
@@ -764,7 +770,7 @@
     <div class="controls">
       <button class="btn btn-primary" id="merge-btn" onclick="mergePDFs()" disabled>
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
-        Merge PDFs
+        Merge to PDF
       </button>
       <button class="btn btn-secondary" onclick="clearFiles('merge')">Clear all</button>
     </div>
@@ -1039,6 +1045,8 @@
   </div>
 </div>
 
+<!-- mammoth.js for DOCX conversion -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.11.0/mammoth.browser.min.js"></script>
 <!-- pdf-lib, PDF.js, StPageFlip -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -1072,7 +1080,8 @@ function onDragLeave(id) { document.getElementById(id).classList.remove('drag-ov
 function onDrop(e, tool) {
   e.preventDefault();
   document.getElementById(`${tool}-drop`).classList.remove('drag-over');
-  const files = [...e.dataTransfer.files].filter(f => f.type === 'application/pdf');
+  let files = [...e.dataTransfer.files];
+  if (tool !== 'merge') files = files.filter(f => f.type === 'application/pdf');
   addFiles(tool, files);
 }
 function onFileSelect(e, tool) { addFiles(tool, [...e.target.files]); e.target.value = ''; }
@@ -1114,6 +1123,11 @@ function moveFile(tool, idx, dir) {
   renderFileList(tool);
 }
 
+function getFileTypeBadge(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const map = { pdf:'PDF', jpg:'JPG', jpeg:'JPG', png:'PNG', webp:'WEB', gif:'GIF', bmp:'BMP', tiff:'TIF', tif:'TIF', docx:'DOC' };
+  return map[ext] || ext.toUpperCase().slice(0,3);
+}
 function renderFileList(tool) {
   const list = document.getElementById(`${tool}-file-list`);
   const files = state[tool].files;
@@ -1121,8 +1135,9 @@ function renderFileList(tool) {
   files.forEach((f, i) => {
     const item = document.createElement('div');
     item.className = 'file-item';
+    const badge = tool === 'merge' ? getFileTypeBadge(f) : 'PDF';
     item.innerHTML = `
-      <div class="file-item-icon">PDF</div>
+      <div class="file-item-icon">${badge}</div>
       <div class="file-item-info">
         <div class="file-item-name">${escHtml(f.name)}</div>
         <div class="file-item-size">${formatBytes(f.size)}</div>
@@ -1178,30 +1193,150 @@ function showResult(tool, info, blob, filename) {
   document.getElementById(`${tool}-result`).classList.add('visible');
 }
 
-// ─── MERGE ───────────────────────────────────────────────────
+// ─── MERGE (universal: PDF + images + DOCX) ──────────────────
+function getMimeFromExt(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  const map = { jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', webp:'image/webp', gif:'image/gif', bmp:'image/bmp', tiff:'image/tiff', tif:'image/tiff' };
+  return map[ext] || null;
+}
+
+async function fileToCanvas(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      resolve(canvas);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+async function docxToCanvases(file) {
+  // Convert docx → HTML via mammoth, render each "page" to canvas
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.convertToHtml({ arrayBuffer });
+  const html = result.value;
+
+  // Render the HTML in a hidden iframe at A4 width, then canvas-capture
+  return new Promise((resolve) => {
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;background:#fff';
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head><style>
+      body{margin:32px;font-family:Georgia,serif;font-size:13px;line-height:1.7;color:#111;background:#fff;word-wrap:break-word}
+      h1,h2,h3{margin:.75em 0 .4em;line-height:1.3} p{margin:.4em 0} ul,ol{margin:.4em 0 .4em 1.5em}
+      table{border-collapse:collapse;width:100%;margin:.5em 0} td,th{border:1px solid #ccc;padding:4px 8px;font-size:12px}
+      img{max-width:100%;height:auto}
+    </style></head><body>${html}</body></html>`);
+    doc.close();
+
+    setTimeout(async () => {
+      const A4W = 794, A4H = 1123;
+      const fullH = iframe.contentDocument.body.scrollHeight;
+      const numPages = Math.max(1, Math.ceil(fullH / A4H));
+      const canvases = [];
+
+      for (let p = 0; p < numPages; p++) {
+        const canvas = document.createElement('canvas');
+        canvas.width = A4W * 2; canvas.height = A4H * 2; // 2x for sharpness
+        const ctx = canvas.getContext('2d');
+        ctx.scale(2, 2);
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, A4W, A4H);
+        // Use foreignObject trick via SVG to render HTML to canvas
+        const svgData = `<svg xmlns="http://www.w3.org/2000/svg" width="${A4W}" height="${A4H}">
+          <foreignObject width="100%" height="100%">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="width:${A4W}px;height:${A4H}px;overflow:hidden;margin-top:${-p * A4H}px">
+              ${iframe.contentDocument.body.outerHTML}
+            </div>
+          </foreignObject>
+        </svg>`;
+        await new Promise(res => {
+          const img = new Image();
+          const blob = new Blob([svgData], {type:'image/svg+xml'});
+          const url = URL.createObjectURL(blob);
+          img.onload = () => { ctx.drawImage(img, 0, 0, A4W, A4H); URL.revokeObjectURL(url); res(); };
+          img.onerror = () => { URL.revokeObjectURL(url); res(); };
+          img.src = url;
+        });
+        canvases.push(canvas);
+      }
+      document.body.removeChild(iframe);
+      resolve(canvases);
+    }, 600);
+  });
+}
+
 async function mergePDFs() {
   const files = state.merge.files;
   if (!files.length) return;
   hideResults('merge');
-  showProgress('merge', 10, 'Loading files…');
+  showProgress('merge', 5, 'Starting…');
   try {
     const { PDFDocument } = PDFLib;
     const merged = await PDFDocument.create();
     let totalPages = 0;
+    const A4W = 595.28, A4H = 841.89; // A4 in PDF points
+
     for (let i = 0; i < files.length; i++) {
-      showProgress('merge', 10 + (i / files.length) * 75, `Processing ${files[i].name}…`);
-      const bytes = await files[i].arrayBuffer();
-      const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
-      const pages = await merged.copyPages(doc, doc.getPageIndices());
-      pages.forEach(p => { merged.addPage(p); totalPages++; });
+      const file = files[i];
+      const pct = 5 + (i / files.length) * 85;
+      showProgress('merge', pct, `Processing ${file.name}…`);
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (ext === 'pdf') {
+        // ── PDF: copy pages directly ──
+        const bytes = await file.arrayBuffer();
+        const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+        const pages = await merged.copyPages(doc, doc.getPageIndices());
+        pages.forEach(p => { merged.addPage(p); totalPages++; });
+
+      } else if (['jpg','jpeg','png','webp','gif','bmp','tiff','tif'].includes(ext)) {
+        // ── Image: fit to A4 page ──
+        const canvas = await fileToCanvas(file);
+        const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const jpegBytes = Uint8Array.from(atob(jpegDataUrl.split(',')[1]), c => c.charCodeAt(0));
+        const img = await merged.embedJpg(jpegBytes);
+
+        // Fit image within A4 with margins, preserving aspect ratio
+        const margin = 28;
+        const maxW = A4W - margin * 2, maxH = A4H - margin * 2;
+        const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+        const drawW = img.width * scale, drawH = img.height * scale;
+        const x = (A4W - drawW) / 2, y = (A4H - drawH) / 2;
+
+        const page = merged.addPage([A4W, A4H]);
+        page.drawImage(img, { x, y, width: drawW, height: drawH });
+        totalPages++;
+
+      } else if (ext === 'docx') {
+        // ── DOCX: convert to canvases, embed as pages ──
+        showProgress('merge', pct, `Converting ${file.name} (this may take a moment)…`);
+        const canvases = await docxToCanvases(file);
+        for (const canvas of canvases) {
+          const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          const jpegBytes = Uint8Array.from(atob(jpegDataUrl.split(',')[1]), c => c.charCodeAt(0));
+          const img = await merged.embedJpg(jpegBytes);
+          const page = merged.addPage([A4W, A4H]);
+          page.drawImage(img, { x: 0, y: 0, width: A4W, height: A4H });
+          totalPages++;
+        }
+      }
     }
-    showProgress('merge', 92, 'Saving…');
+
+    showProgress('merge', 95, 'Saving…');
     const out = await merged.save();
     const blob = new Blob([out], { type: 'application/pdf' });
-    showProgress('merge', 100, 'Done!');
-    showResult('merge', `${files.length} files merged → ${totalPages} pages, ${formatBytes(blob.size)}`, blob, 'merged.pdf');
+    showResult('merge', `${files.length} file${files.length !== 1 ? 's' : ''} merged → ${totalPages} pages · ${formatBytes(blob.size)}`, blob, 'merged.pdf');
   } catch(e) {
-    showError('merge', 'Could not merge PDFs. Make sure the files are valid and not password-protected.');
+    showError('merge', 'Merge failed. Check that all files are valid and not password-protected.');
     console.error(e);
   }
 }
